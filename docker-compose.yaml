@@ -1,0 +1,9 @@
+services:
+  web: # サービス名（任意）
+    build: . # 同じディレクトリにある Dockerfile からビルド
+    ports:
+      - "8080:80" # ホストの8080番をコンテナの80番に繋ぐ
+    volumes:
+      - .:/src # ローカルのファイルをコンテナ内に同期（開発に便利）
+    environment:
+      - DEBUG=true # 環境変数の設定
