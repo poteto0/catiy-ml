@@ -1,13 +1,11 @@
-from typing import TYPE_CHECKING
+from typing import cast
 
-from fastapi import Depends
+from fastapi import Request
+from ultralytics import YOLO
 
-from app.infra.depends.base import get_state
 from app.types.state import AppState
 
-if TYPE_CHECKING:
-    from ultralytics import YOLO
 
-
-def get_catiy_yolo(state: AppState = Depends(get_state)) -> YOLO:
+def get_catiy_yolo(request: Request) -> YOLO:
+    state = cast("AppState", request.app.state)
     return state.catiyYolo

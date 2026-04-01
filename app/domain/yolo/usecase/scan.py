@@ -1,10 +1,8 @@
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import numpy as np
 from torch.fft import Tensor
-
-if TYPE_CHECKING:
-    from ultralytics.engine.results import Results
+from ultralytics.engine.results import Results
 
 
 def has_target(

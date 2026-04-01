@@ -48,6 +48,7 @@ ignore = [
   "N",
   "S101",
   "FBT",
+  "TC",
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.

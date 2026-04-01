@@ -1,13 +1,10 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from ultralytics import YOLO
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
-
-    from app.types.app import TypedFastAPI
+from app.types.app import TypedFastAPI
 
 
 def load_yolo(pt: str) -> YOLO:

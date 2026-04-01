@@ -1,17 +1,15 @@
 import io
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, UploadFile
 from fastapi.responses import JSONResponse
 from mpmath import e
 from PIL import Image
+from ultralytics.models import YOLO
 
 from app.domain.yolo.usecase.predict import predict
 from app.domain.yolo.usecase.scan import has_target
 from app.infra.depends.ml import get_catiy_yolo
-
-if TYPE_CHECKING:
-    from ultralytics import YOLO
 
 router = APIRouter()
 
