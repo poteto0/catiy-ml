@@ -1,11 +1,11 @@
-from fastapi import FastAPI
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-app = FastAPI()
+router = APIRouter()
 
 
-@app.get("/")
-async def root() -> JSONResponse:
+@router.get("")
+async def health_check() -> JSONResponse:
     return JSONResponse(
         content={
             "msg": "Hello Catiy ML",

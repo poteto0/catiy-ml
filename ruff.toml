@@ -26,6 +26,7 @@ exclude = [
     "node_modules",
     "site-packages",
     "venv",
+    "__init__.py"
 ]
 
 # Same as Black.
@@ -43,6 +44,10 @@ select = ["ALL"]
 ignore = [
   "D",
   "T201",
+  "B008",
+  "N",
+  "S101",
+  "FBT",
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
