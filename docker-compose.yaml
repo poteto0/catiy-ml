@@ -1,9 +1,36 @@
 services:
-  web: # サービス名（任意）
+  catiy_ml: # サービス名（任意）
     build: . # 同じディレクトリにある Dockerfile からビルド
     ports:
-      - "8080:80" # ホストの8080番をコンテナの80番に繋ぐ
+      - "8080:8080" # ホストの8080番をコンテナの80番に繋ぐ
     volumes:
-      - .:/src # ローカルのファイルをコンテナ内に同期（開発に便利）
-    environment:
-      - DEBUG=true # 環境変数の設定
+      - .:/app # ローカルのファイルをコンテナ内に同期（開発に便利）
+      - /app/.venv # .venvだけはコンテナのものを使う
+    env_file:
+      - .env
+    depends_on:
+      catiy_db:
+        condition: service_healthy
+
+  catiy_db:
+    image: postgres:17
+    container_name: postgres-db
+    ports:
+      - "5434:5432"
+    env_file:
+      - .env
+    # データを永続化するためのボリューム
+    volumes:
+      # ボリューム名を指定してデータをホストOS上に保持
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+# 永続化用のボリュームを定義 (データベースデータ用)
+volumes:
+  postgres_data:

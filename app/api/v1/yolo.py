@@ -1,49 +1,41 @@
-import io
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, UploadFile
-from fastapi.responses import JSONResponse
-from mpmath import e
-from PIL import Image
+from fastapi import APIRouter, BackgroundTasks, Depends, UploadFile
+from sqlalchemy.orm import Session
 from ultralytics.models import YOLO
 
-from app.domain.yolo.usecase.predict import predict
-from app.domain.yolo.usecase.scan import has_target
+from app.api.schema.model import TaskModel
+from app.domain.yolo.tasks.detect_cat import detect_cat_task
+from app.factory.task import init_task
+from app.infra.depends.db import get_db
 from app.infra.depends.ml import get_catiy_yolo
+from app.infra.repository.task import create_tasks
 
 router = APIRouter()
 
 
 @router.post("/detect/cat")
 async def detect_cat(
+    backgroundTasks: BackgroundTasks,
     file: UploadFile,
+    db: Annotated[Session, Depends(get_db)],
     model: Annotated[YOLO, Depends(get_catiy_yolo)],
-) -> JSONResponse:
+) -> TaskModel:
     imgBytes = await file.read()
-    img: Image.Image | None = None
-    try:
-        img = Image.open(io.BytesIO(imgBytes))
-        img.verify()
-        img = Image.open(io.BytesIO(imgBytes))
-    except e:
-        raise
+    task = init_task()
+    create_tasks(db=db, tasks=[task])
 
-    if img is None:
-        return None
+    backgroundTasks.add_task(
+        detect_cat_task,
+        imgBytes=imgBytes,
+        db=db,
+        model=model,
+        task=task,
+    )
 
-    results = predict(model=model, image=img)
-    for result in results:
-        if has_target(result=result, targetLabel="cat"):
-            return JSONResponse(
-                content={
-                    "result": True,
-                },
-                status_code=200,
-            )
-
-    return JSONResponse(
-        content={
-            "result": False,
-        },
-        status_code=200,
+    return TaskModel(
+        id=task.id,
+        status=task.status,
+        hasCat=task.has_cat,
+        cats=[],
     )

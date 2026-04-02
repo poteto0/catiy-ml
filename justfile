@@ -16,3 +16,15 @@ check:
 
 [group("ci")]
 ci: fmt lint check
+
+[group("develop")]
+upload-cat:
+  @curl -X 'POST'   'http://localhost:8080/v1/yolo/detect/cat' -H 'accept: application/json'   -H 'Content-Type: multipart/form-data'   -F 'file=@./fixtures/cat.jpg;type=image/jpeg'
+
+[group("develop")]
+up:
+  @uv run fastapi run app/main.py --port 8080
+
+[group("develop")]
+attach:
+  @docker exec -it catiy-ml-catiy_ml-1 /bin/bash
