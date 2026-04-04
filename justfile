@@ -15,7 +15,14 @@ check:
   @uv run ty check
 
 [group("ci")]
-ci: fmt lint check
+test:
+  @uv run pytest
+
+[group("ci")]
+ci: fmt lint check test
+
+[group("ci")]
+ci-check: fmt-check lint check test
 
 [group("develop")]
 upload-cat:
