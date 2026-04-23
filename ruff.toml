@@ -51,6 +51,8 @@ ignore = [
   "FBT",
   "TC",
   "BLE001",
+  "TD",
+  "FIX"
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.

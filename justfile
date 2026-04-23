@@ -30,7 +30,7 @@ upload-cat:
 
 [group("develop")]
 up:
-  @uv run fastapi run app/main.py --port 8080
+  @docker compose up
 
 [group("develop")]
 attach:

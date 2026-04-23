@@ -3,8 +3,10 @@ import uuid
 from pydantic.dataclasses import dataclass
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from starlette.status import HTTP_503_SERVICE_UNAVAILABLE
 
 from app.ents import Task
+from app.exceptions.app import AppException
 
 
 def create_tasks(db: Session, tasks: list[Task]) -> None:
@@ -42,6 +44,10 @@ def update_tasks_status(db: Session, updateQueries: list[TaskStatusUpdate]) -> N
                 task.has_cat = update.hasCat
             tasks.append(task)
         db.commit()
-    except SQLAlchemyError:
+    except SQLAlchemyError as esc:
         db.rollback()
-        raise
+        raise AppException(
+            code="SQL_ERROR",
+            msg="sql error on update task",
+            statusCode=HTTP_503_SERVICE_UNAVAILABLE,
+        ) from esc
