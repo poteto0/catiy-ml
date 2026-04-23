@@ -1,15 +1,15 @@
-from typing import Any
-
 import cv2
 import numpy as np
 from torch.fft import Tensor
 from ultralytics.engine.results import Results
 
+from app.types.image import ImageRaw
+
 
 def trim_all_target(
     result: Results,
     targetLabel: str = "cat",
-) -> list[np.ndarray[Any, np.dtype[np.integer[Any] | np.floating[Any]]]] | None:
+) -> list[ImageRaw] | None:
     targetIndices = _detect_target_idx(
         result=result,
         targetLabel=targetLabel,
@@ -25,7 +25,7 @@ def trim_all_target(
     if not isinstance(xyBoxes, Tensor):
         return None
 
-    catImages: list[np.ndarray[Any, np.dtype[np.integer[Any] | np.floating[Any]]]] = []
+    catImages: list[ImageRaw] = []
     labeledXy = xyBoxes.cpu().numpy()
     for _, targetIdx in enumerate(targetIndices):
         x1, y1, x2, y2 = labeledXy[targetIdx].astype(int)
@@ -54,7 +54,7 @@ def has_target(
 def _detect_target_idx(
     result: Results,
     targetLabel: str = "cat",
-) -> np.ndarray[tuple[Any, ...], np.dtype[np.int64]] | None:
+) -> ImageRaw | None:
     classNames = result.names
 
     targetId = _get_target_id(
