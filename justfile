@@ -25,12 +25,24 @@ ci: fmt lint check test
 ci-check: fmt-check lint check test
 
 [group("develop")]
-upload-cat:
-  @curl -X 'POST'   'http://localhost:8080/v1/yolo/detect/cat' -H 'accept: application/json'   -H 'Content-Type: multipart/form-data'   -F 'file=@./fixtures/cat.jpg;type=image/jpeg'
+detect-cat:
+  @curl -X 'POST' \
+      'http://localhost:8080/v1/yolo/detect/cat' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: multipart/form-data' \
+      -F 'file=@./fixtures/cat.jpg;type=image/jpeg'
 
 [group("develop")]
-up:
-  @docker compose up
+trimming-cat:
+  @curl -X 'POST' \
+      'http://localhost:8080/v1/yolo/trim/cat' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: multipart/form-data' \
+      -F 'file=@./fixtures/cat.jpg;type=image/jpeg'
+
+[group("develop")]
+up *args="":
+  @docker compose up {{args}}
 
 [group("develop")]
 attach:

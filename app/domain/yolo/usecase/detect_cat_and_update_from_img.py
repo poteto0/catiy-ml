@@ -1,3 +1,4 @@
+from loguru import logger
 from PIL.Image import Image
 from sqlalchemy.orm import Session
 from ultralytics.engine.results import Results
@@ -16,16 +17,23 @@ def detect_cat_and_update_from_img(
     model: YOLO,
     task: Task,
 ) -> tuple[list[Results], bool]:
+    logger.info("detect_cat_and_update_from_img:start")
     results = predict(model=model, image=img)
 
     for result in results:
-        if has_target(result=result, targetLabel="cat"):
+        if not has_target(result=result, targetLabel="cat"):
             query = TaskStatusUpdate(
                 taskId=task.id,
                 status=TaskStatus.DETECT_CAT_FINISHED,
                 hasCat=True,
             )
             update_tasks_status(db, [query])
+            logger.info(
+                "detect_cat_and_update_from_img:finish",
+                extra={
+                    "result": "not found cat",
+                },
+            )
             return ([], False)
 
     query = TaskStatusUpdate(
@@ -34,4 +42,10 @@ def detect_cat_and_update_from_img(
         hasCat=False,
     )
     update_tasks_status(db, [query])
+    logger.info(
+        "detect_cat_and_update_from_img:finish",
+        extra={
+            "result": "found cat",
+        },
+    )
     return (results, True)

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "alembic>=1.18.4",
+    "boto3>=1.42.95",
     "fastapi[standard]>=0.135.2",
     "loguru>=0.7.3",
     "psycopg[binary]>=3.3.3",
@@ -15,6 +16,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "boto3-stubs[s3]>=1.42.95",
     "pytest>=9.0.2",
     "pytest-cov>=7.1.0",
     "ruff>=0.15.8",

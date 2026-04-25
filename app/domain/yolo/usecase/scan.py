@@ -9,7 +9,7 @@ from app.types.image import ImageRaw
 def trim_all_target(
     result: Results,
     targetLabel: str = "cat",
-) -> list[ImageRaw] | None:
+) -> list[bytes] | None:
     targetIndices = _detect_target_idx(
         result=result,
         targetLabel=targetLabel,
@@ -25,14 +25,15 @@ def trim_all_target(
     if not isinstance(xyBoxes, Tensor):
         return None
 
-    catImages: list[ImageRaw] = []
+    catImages: list[bytes] = []
     labeledXy = xyBoxes.cpu().numpy()
     for _, targetIdx in enumerate(targetIndices):
         x1, y1, x2, y2 = labeledXy[targetIdx].astype(int)
 
         trimmedCat = result.orig_img[y1:y2, x1:x2]
         trimmedCatRGB = cv2.cvtColor(trimmedCat, cv2.COLOR_BGR2RGB)
-        catImages.append(trimmedCatRGB)
+        trimmedCatBytes = cv2.imencode(".jpg", trimmedCatRGB)[1].tobytes()
+        catImages.append(trimmedCatBytes)
     return catImages
 
 
@@ -61,6 +62,7 @@ def _detect_target_idx(
         classNames=classNames,
         targetLabel=targetLabel,
     )
+    print(targetId)
     if targetId < 0:
         return None
 
