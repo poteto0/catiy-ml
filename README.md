@@ -15,3 +15,7 @@ normal -> {"status": "classify_cat:finish", "taskId": "<uuid>", "has_cat": true,
 ### 未定ゾーン
 
 - `upload_immich`
+
+### 他
+
+detect_catもoriginalImageをR2に上げようか。

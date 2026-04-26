@@ -15,16 +15,16 @@ def verify_image(
         img = Image.open(io.BytesIO(imgBytes))
         img.verify()
         img = Image.open(io.BytesIO(imgBytes))
-    except Exception as esc:
+    except Exception as exc:
         logger.error(
             INVALID_IMAGE,
-            extra={"err": esc},
+            extra={"err": exc},
         )
         raise AppException(
             code=INVALID_IMAGE,
             msg=f"invalid imageBytes: {imgBytes}",
             statusCode=HTTP_400_BAD_REQUEST,
-        ) from esc
+        ) from exc
 
     if img is None:
         logger.error(EMPTY_IMAGE)

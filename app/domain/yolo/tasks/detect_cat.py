@@ -31,13 +31,5 @@ def detect_cat_task(
         update_tasks_status(db, [query])
         return
 
-    try:
-        detect_cat_and_update_from_img(img, db, model, task)
-    except AppException:
-        query = TaskStatusUpdate(
-            taskId=task.id,
-            status=TaskStatus.DETECT_CAT_FAILED,
-            hasCat=False,
-        )
-        update_tasks_status(db, [query])
-        return
+    detect_cat_and_update_from_img(img, db, model, task)
+    return

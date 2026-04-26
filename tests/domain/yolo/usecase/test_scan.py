@@ -7,7 +7,7 @@ import torch
 from app.domain.yolo.usecase.scan import has_target
 
 
-class TestYoloUsecaseScan:
+class TestYoloUsecasexcan:
     def createDummyResult(
         self,
         classNames: dict[int, str],

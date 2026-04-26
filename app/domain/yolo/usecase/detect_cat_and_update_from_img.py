@@ -18,34 +18,45 @@ def detect_cat_and_update_from_img(
     task: Task,
 ) -> tuple[list[Results], bool]:
     logger.info("detect_cat_and_update_from_img:start")
-    results = predict(model=model, image=img)
 
-    for result in results:
-        if not has_target(result=result, targetLabel="cat"):
-            query = TaskStatusUpdate(
-                taskId=task.id,
-                status=TaskStatus.DETECT_CAT_FINISHED,
-                hasCat=True,
-            )
-            update_tasks_status(db, [query])
-            logger.info(
-                "detect_cat_and_update_from_img:finish",
-                extra={
-                    "result": "not found cat",
-                },
-            )
-            return ([], False)
+    try:
+        results = predict(model=model, image=img)
 
-    query = TaskStatusUpdate(
-        taskId=task.id,
-        status=TaskStatus.DETECT_CAT_FINISHED,
-        hasCat=False,
-    )
-    update_tasks_status(db, [query])
-    logger.info(
-        "detect_cat_and_update_from_img:finish",
-        extra={
-            "result": "found cat",
-        },
-    )
-    return (results, True)
+        for result in results:
+            if not has_target(result=result, targetLabel="cat"):
+                query = TaskStatusUpdate(
+                    taskId=task.id,
+                    status=TaskStatus.DETECT_CAT_FINISHED,
+                    hasCat=True,
+                )
+                update_tasks_status(db, [query])
+                logger.info(
+                    "detect_cat_and_update_from_img:finish",
+                    extra={
+                        "result": "not found cat",
+                    },
+                )
+                return ([], False)
+
+        query = TaskStatusUpdate(
+            taskId=task.id,
+            status=TaskStatus.DETECT_CAT_FINISHED,
+            hasCat=False,
+        )
+        update_tasks_status(db, [query])
+    except Exception:
+        query = TaskStatusUpdate(
+            taskId=task.id,
+            status=TaskStatus.DETECT_CAT_FAILED,
+            hasCat=False,
+        )
+        update_tasks_status(db, [query])
+        return ([], False)
+    else:
+        logger.info(
+            "detect_cat_and_update_from_img:finish",
+            extra={
+                "result": "found cat",
+            },
+        )
+        return (results, True)
