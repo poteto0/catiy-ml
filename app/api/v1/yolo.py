@@ -22,6 +22,7 @@ async def detect_cat(
     backgroundTasks: BackgroundTasks,
     file: UploadFile,
     db: Annotated[Session, Depends(get_db)],
+    r2Client: Annotated[S3Client, Depends(get_r2)],
     model: Annotated[YOLO, Depends(get_catiy_yolo)],
 ) -> TaskModel:
     imgBytes = await file.read()
@@ -32,6 +33,7 @@ async def detect_cat(
         detect_cat_task,
         imgBytes=imgBytes,
         db=db,
+        r2Client=r2Client,
         model=model,
         task=task,
     )

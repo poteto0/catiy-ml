@@ -1,5 +1,3 @@
-import uuid
-
 from mypy_boto3_s3 import S3Client
 from sqlalchemy.orm import Session
 from ultralytics.models import YOLO
@@ -8,12 +6,12 @@ from app.constants.task_status import TaskStatus
 from app.domain.yolo.usecase.detect_cat_and_update_from_img import (
     detect_cat_and_update_from_img,
 )
-from app.domain.yolo.usecase.scan import trim_all_target
+from app.domain.yolo.usecase.trim_cat_and_update_from_results import (
+    trim_cat_and_update_from_results,
+)
 from app.domain.yolo.usecase.verify_image import verify_image
 from app.ents import Task
-from app.ents.schema import Cat
 from app.exceptions.app import AppException
-from app.infra.repository.cat import create_cats, upload_cat_image
 from app.infra.repository.task import (
     TaskStatusUpdate,
     update_tasks_status,
@@ -39,46 +37,18 @@ def trim_cat_task(
         return
 
     (results, hasCat) = detect_cat_and_update_from_img(
-        img,
-        db,
-        model,
-        task,
+        img=img,
+        db=db,
+        r2Client=r2Client,
+        model=model,
+        task=task,
     )
     if not hasCat:
         return
 
-    allCatImages: list[bytes] = []
-    for result in results:
-        cats = trim_all_target(result=result, targetLabel="cat")
-        if cats is None:
-            continue
-
-        allCatImages.extend(cats)
-
-    try:
-        catEnts: list[Cat] = []
-        for catImage in allCatImages:
-            fileName = f"{uuid.uuid4()}.jpg"
-            catEnt = Cat(
-                id=uuid.uuid4(),
-                cat_name="",
-                cat_image_url=fileName,
-                task_id=task.id,
-            )
-            upload_cat_image(
-                r2Client=r2Client,
-                fileName=fileName,
-                imgBytes=catImage,
-            )
-            catEnts.append(catEnt)
-
-        create_cats(db, catEnts)
-
-    except AppException:
-        query = TaskStatusUpdate(
-            taskId=task.id,
-            status=TaskStatus.TRIM_CAT_FAILED,
-            hasCat=True,
-        )
-        update_tasks_status(db, [query])
-        return
+    trim_cat_and_update_from_results(
+        results=results,
+        db=db,
+        r2Client=r2Client,
+        task=task,
+    )

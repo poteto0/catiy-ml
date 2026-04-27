@@ -1,9 +1,9 @@
-import cv2
 import numpy as np
 from torch.fft import Tensor
 from ultralytics.engine.results import Results
 
 from app.types.image import ImageRaw
+from app.utils.image import transform_raw_image_to_rgb_bytes
 
 
 def trim_all_target(
@@ -31,9 +31,9 @@ def trim_all_target(
         x1, y1, x2, y2 = labeledXy[targetIdx].astype(int)
 
         trimmedCat = result.orig_img[y1:y2, x1:x2]
-        trimmedCatRGB = cv2.cvtColor(trimmedCat, cv2.COLOR_BGR2RGB)
-        trimmedCatBytes = cv2.imencode(".jpg", trimmedCatRGB)[1].tobytes()
-        catImages.append(trimmedCatBytes)
+        catImages.append(
+            transform_raw_image_to_rgb_bytes(trimmedCat),
+        )
     return catImages
 
 
