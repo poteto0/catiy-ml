@@ -9,21 +9,21 @@ from app.utils.image import transform_raw_image_to_rgb_bytes
 def trim_all_target(
     result: Results,
     targetLabel: str = "cat",
-) -> list[bytes] | None:
+) -> list[bytes]:
+    resultBoxes = result.boxes
+    if resultBoxes is None:
+        return []
+
     targetIndices = _detect_target_idx(
         result=result,
         targetLabel=targetLabel,
     )
-    if targetIndices is None:
-        return None
-
-    resultBoxes = result.boxes
-    if resultBoxes is None:
-        return None
+    if targetIndices is None or len(targetIndices) == 0:
+        return []
 
     xyBoxes = resultBoxes.xyxy
     if not isinstance(xyBoxes, Tensor):
-        return None
+        return []
 
     catImages: list[bytes] = []
     labeledXy = xyBoxes.cpu().numpy()

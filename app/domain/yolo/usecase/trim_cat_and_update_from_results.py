@@ -25,7 +25,7 @@ def trim_cat_and_update_from_results(
             result=result,
             targetLabel="cat",
         )
-        if cats is None:
+        if len(cats) == 0:
             continue
 
         allCatImages.extend(cats)

@@ -15,14 +15,18 @@ check:
   @uv run ty check
 
 [group("ci")]
-test:
+ut-cov:
+  @uv run pytest --cov --cov-report=xml --cov-report=term
+
+[group("ci")]
+ut:
   @uv run pytest
 
 [group("ci")]
-ci: fmt lint check test
+ci: fmt lint check ut
 
 [group("ci")]
-ci-check: fmt-check lint check test
+ci-check: fmt-check lint check ut
 
 [group("develop")]
 detect-cat:
