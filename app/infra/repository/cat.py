@@ -1,4 +1,5 @@
 import io
+import uuid
 
 from botocore import exceptions as botexc
 from loguru import logger
@@ -12,6 +13,7 @@ from starlette.status import (
     HTTP_503_SERVICE_UNAVAILABLE,
 )
 
+from app.api.schema.model import CatModel
 from app.constants.error_code import (
     R2_CLIENT_ERROR,
     R2_CONNECTION_ERROR,
@@ -33,6 +35,25 @@ def create_cats(db: Session, cats: list[Cat]) -> None:
         raise AppException(
             code=SQL_ERROR,
             msg="sql error on create cats",
+            statusCode=HTTP_503_SERVICE_UNAVAILABLE,
+        ) from exc
+
+
+def find_cats_by_task_id(db: Session, taskId: uuid.UUID) -> list[CatModel]:
+    try:
+        cats = db.query(Cat).filter(Cat.task_id == taskId).all()
+        return [
+            CatModel(
+                id=cat.id,
+                catName=cat.cat_name,
+                catImageUrl=cat.cat_image_url,
+            )
+            for cat in cats
+        ]
+    except SQLAlchemyError as exc:
+        raise AppException(
+            code=SQL_ERROR,
+            msg="sql error on find cats",
             statusCode=HTTP_503_SERVICE_UNAVAILABLE,
         ) from exc
 

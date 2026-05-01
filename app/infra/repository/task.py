@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_503_SERVICE_UNAVAILABLE
 
+from app.api.schema.model import TaskModel
 from app.constants.error_code import SQL_ERROR
 from app.ents import Task
 from app.exceptions.app import AppException
@@ -24,7 +25,20 @@ def create_tasks(db: Session, tasks: list[Task]) -> None:
         ) from exc
 
 
-def find_task_by_id(db: Session, taskId: uuid.UUID) -> Task | None:
+def find_task_by_id(db: Session, taskId: uuid.UUID) -> TaskModel | None:
+    task = db.query(Task).filter(Task.id == taskId).first()
+    if task is None:
+        return None
+
+    return TaskModel(
+        id=task.id,
+        status=task.status,
+        hasCat=task.has_cat,
+        cats=[],
+    )
+
+
+def _find_task_by_id(db: Session, taskId: uuid.UUID) -> Task | None:
     try:
         return db.query(Task).filter(Task.id == taskId).first()
     except SQLAlchemyError as exc:
@@ -46,7 +60,7 @@ def update_tasks_status(db: Session, updateQueries: list[TaskStatusUpdate]) -> N
     try:
         tasks = []
         for update in updateQueries:
-            task = find_task_by_id(db, update.taskId)
+            task = _find_task_by_id(db, update.taskId)
             if task is None:
                 continue
             task.status = update.status

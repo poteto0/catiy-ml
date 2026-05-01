@@ -8,6 +8,7 @@ from starlette.status import HTTP_400_BAD_REQUEST
 from app.api.schema.model import TaskModel
 from app.exceptions.app import AppException
 from app.infra.depends.db import get_db
+from app.infra.repository.cat import find_cats_by_task_id
 from app.infra.repository.task import find_task_by_id
 
 router = APIRouter()
@@ -29,9 +30,9 @@ async def task_status(
             statusCode=HTTP_400_BAD_REQUEST,
         )
 
-    return TaskModel(
-        id=task.id,
-        status=task.status,
-        hasCat=task.has_cat,
-        cats=[],
-    )
+    cats = find_cats_by_task_id(db=db, taskId=taskId)
+    if len(cats) == 0:
+        return task
+
+    task.cats = cats
+    return task
