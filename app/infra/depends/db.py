@@ -1,11 +1,12 @@
 from collections.abc import Generator
+from typing import Any
 
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.infra.db.engine import engine
 
 
-def get_db() -> Generator[Session]:
+def get_db() -> Generator[Session, Any, None]:
     with sessionmaker(
         autocommit=False,
         autoflush=False,

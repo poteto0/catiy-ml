@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from pydantic import PostgresDsn
 
@@ -6,6 +7,7 @@ from pydantic import PostgresDsn
 class AppSetting:
     def __init__(
         self,
+        databaseUrl: Optional[str],
         postgresUser: str,
         postgresPassword: str,
         postgresHost: str,
@@ -15,6 +17,7 @@ class AppSetting:
         r2AccessKeyID: str,
         r2AccessSecretKey: str,
     ):
+        self.databaseUrl = databaseUrl
         self.postgresUser = postgresUser
         self.postgresPassword = postgresPassword
         self.postgresHost = postgresHost
@@ -25,18 +28,27 @@ class AppSetting:
         self.r2AccessSecretKey = r2AccessSecretKey
 
     @property
-    def dsn(self) -> PostgresDsn:
-        return PostgresDsn.build(
-            scheme="postgresql+psycopg",
-            username=self.postgresUser,
-            password=self.postgresPassword,
-            host=self.postgresHost,
-            port=self.postgresPort,
-            path=self.postgresDB,
+    def dsn(self) -> str:
+        if self.databaseUrl:
+            return self.databaseUrl
+        return str(
+            PostgresDsn.build(
+                scheme="postgresql+psycopg",
+                username=self.postgresUser,
+                password=self.postgresPassword,
+                host=self.postgresHost,
+                port=self.postgresPort,
+                path=self.postgresDB,
+            )
         )
 
 
 def init_setting() -> AppSetting:
+    env = os.getenv("ENV")
+    databaseUrl = os.getenv("DATABASE_URL")
+    if env == "TEST" and not databaseUrl:
+        databaseUrl = "sqlite:///:memory:"
+
     psqlUser = os.getenv("POSTGRES_USER") or ""
     psqlDB = os.getenv("POSTGRES_DB") or ""
     psqlHost = os.getenv("POSTGRES_HOST") or ""
@@ -47,6 +59,7 @@ def init_setting() -> AppSetting:
     r2AccessSecretKey = os.getenv("R2_ACCESS_SECRET_KEY") or ""
 
     return AppSetting(
+        databaseUrl=databaseUrl,
         postgresUser=psqlUser,
         postgresDB=psqlDB,
         postgresHost=psqlHost,

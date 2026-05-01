@@ -16,11 +16,11 @@ check:
 
 [group("ci")]
 ut-cov:
-  @uv run pytest --cov --cov-report=xml --cov-report=term
+  @ENV=TEST uv run pytest --cov --cov-report=xml --cov-report=term
 
 [group("ci")]
 ut:
-  @uv run pytest
+  @ENV=TEST uv run pytest
 
 [group("ci")]
 ci: fmt lint check ut
