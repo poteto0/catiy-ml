@@ -6,4 +6,3 @@ if TYPE_CHECKING:
 
 class AppState:
     catiyYolo: YOLO
-

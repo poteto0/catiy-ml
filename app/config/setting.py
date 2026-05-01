@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 from pydantic import PostgresDsn
 
@@ -7,7 +6,7 @@ from pydantic import PostgresDsn
 class AppSetting:
     def __init__(
         self,
-        databaseUrl: Optional[str],
+        databaseUrl: str | None,
         postgresUser: str,
         postgresPassword: str,
         postgresHost: str,
@@ -16,7 +15,7 @@ class AppSetting:
         r2AccountID: str,
         r2AccessKeyID: str,
         r2AccessSecretKey: str,
-    ):
+    ) -> None:
         self.databaseUrl = databaseUrl
         self.postgresUser = postgresUser
         self.postgresPassword = postgresPassword
@@ -39,7 +38,7 @@ class AppSetting:
                 host=self.postgresHost,
                 port=self.postgresPort,
                 path=self.postgresDB,
-            )
+            ),
         )
 
 
