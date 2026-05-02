@@ -101,9 +101,7 @@ def test_can_update_task_status(setup_db: Session, task_sample: list[Task]) -> N
     assert task.has_cat is True
 
 
-def test_update_tasks_status_rollback_on_commit_failed(
-    setup_db: Session, task_sample: list[Task]
-) -> None:
+def test_update_tasks_status_rollback_on_commit_failed() -> None:
     """更新エラー発生時に、ロールバックする"""
     # Arrange
     db = MagicMock(spec=Session)
