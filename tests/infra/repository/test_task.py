@@ -42,17 +42,17 @@ def task_sample() -> list[Task]:
     ]
 
 
-def test_can_create_provided_tasks() -> None:
+def test_can_create_provided_tasks(setup_db: Session) -> None:
     """taskレコードを作成できる"""
     # Arrange
-    db = MagicMock(spec=Session)
+    db = setup_db
+    tasks = [Task(id=taskId, status="pending", has_cat=False)]
 
     # Act
-    create_tasks(db, [Task(id=taskId, status="pending", has_cat=False)])
+    create_tasks(db, tasks)
 
     # Assert
-    assert db.add_all.called
-    assert db.commit.called
+    assert db.query(Task).count() == 1
 
 
 def test_create_tasks_rollback_on_commit_failed(task_sample: list[Task]) -> None:
@@ -68,12 +68,12 @@ def test_create_tasks_rollback_on_commit_failed(task_sample: list[Task]) -> None
     assert db.rollback.called
 
 
-def test_can_find_task_by_id() -> None:
+def test_can_find_task_by_id(setup_db: Session, task_sample: list[Task]) -> None:
     """idでtaskを見つけることが可能"""
     # Arrange
-    db = MagicMock(spec=Session)
-    task = Task(id=taskId, status="pending", has_cat=False)
-    db.query.return_value.filter.return_value.first.return_value = task
+    db = setup_db
+    db.add_all(task_sample)
+    db.commit()
 
     # Act
     found_task = find_task_by_id(db, taskId)
@@ -83,30 +83,31 @@ def test_can_find_task_by_id() -> None:
     assert found_task.id == taskId
 
 
-def test_can_update_task_status() -> None:
+def test_can_update_task_status(setup_db: Session, task_sample: list[Task]) -> None:
     """taskのステータスを更新できる"""
     # Arrange
-    db = MagicMock(spec=Session)
-    task = Task(id=taskId, status="pending", has_cat=False)
-    # Mock _find_task_by_id internal call
-    db.query.return_value.filter.return_value.first.return_value = task
+    db = setup_db
+    db.add_all(task_sample)
+    db.commit()
     update = TaskStatusUpdate(taskId=taskId, status="completed", hasCat=True)
 
     # Act
     update_tasks_status(db, [update])
 
     # Assert
+    task = db.query(Task).filter(Task.id == taskId).first()
+    assert task is not None
     assert task.status == "completed"
     assert task.has_cat is True
-    assert db.commit.called
 
 
-def test_update_tasks_status_rollback_on_commit_failed() -> None:
+def test_update_tasks_status_rollback_on_commit_failed(setup_db: Session, task_sample: list[Task]) -> None:
     """更新エラー発生時に、ロールバックする"""
     # Arrange
     db = MagicMock(spec=Session)
-    # Mock _find_task_by_id to return a task
-    db.query.return_value.filter.return_value.first.return_value = Task(id=taskId, status="pending", has_cat=False)
+    # Return a real task object for the query mock
+    task = Task(id=taskId, status="pending", has_cat=False)
+    db.query.return_value.filter.return_value.first.return_value = task
     db.commit.side_effect = SQLAlchemyError
     update = TaskStatusUpdate(taskId=taskId, status="failed", hasCat=False)
 

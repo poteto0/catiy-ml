@@ -1,21 +1,19 @@
-- `detect_cat`: 猫が写っているかどうかを判定する
-- `trim_cat`: 猫部分のみトリミングする(`detect_cat`)
-- `classify_cat`: 猫の判別を行う(`trim_cat`)
-- `status_task`: taskのstatusを見る
+# catiy-ml
 
-他のapiはそれぞれ到達部分までやるイメージ
-`classify_cat`: register task, -> {"status": "draft", "taskId": "<uuid>", "has_cat": false, "cats": []}
-=> `detect_cat`: false -> {"status": "finish", "taskId": "<uuid>", "has_cat": false, "cats": []}
-| yes, status="detect_cat:finish", has_cat=true
-=> `trim_cat`: error -> {"status": "trim_cat:failed", "taskId": "<uuid>", "has_cat": true, "cats": []}
-| normal, status="trim_cat:finish", cat_images=[<r2-uploaded>...]
-=> `classify_cat`: error =>
-normal -> {"status": "classify_cat:finish", "taskId": "<uuid>", "has_cat": true, "cats": [{"cat_name": "<cat-name>", "cat_image": "<r2-uploaded>"}]}
+Yoloで、画像中の猫を判定するAPI
 
-### 未定ゾーン
+- 猫の有無判定
+- 猫の画像トリミング
 
-- `upload_immich`
+## Api
 
-### 他
+- 判定した猫の画像をcloudflare R2に上げる
+- 判定などは時差で行い、タスクステータスを後から問い合わせる設計
 
-detect_catもoriginalImageをR2に上げようか。
+## Contribution
+
+- `app/`: application
+- `tests/`: ut(不要そうなところはいらない)
+- `e2e/`: e2eテスト(ローカルでの実行を想定)
+
+`just ci`が通ったらコミット可能

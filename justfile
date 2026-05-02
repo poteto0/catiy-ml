@@ -16,17 +16,28 @@ check:
 
 [group("ci")]
 ut-cov:
-  @ENV=TEST uv run pytest --cov --cov-report=xml --cov-report=term
+  @ENV=TEST uv run pytest --cov --cov-report=xml --cov-report=term -m "not e2e"
 
 [group("ci")]
 ut:
-  @ENV=TEST uv run pytest
+  @ENV=TEST uv run pytest -m "not e2e"
 
 [group("ci")]
-ci: fmt lint check ut
+e2e:
+  @ENV=TEST uv run pytest -m "e2e"
 
+[group("ci")]
+ci: fmt lint check ut e2e
+
+# ワークフロー用 e2eを実行しない&フォーマットしない
 [group("ci")]
 ci-check: fmt-check lint check ut
+
+[group("develop")]
+task-status +taskId:
+  @curl -X 'GET' \
+      'http://localhost:8080/v1/task/status/{{taskId}}' \
+      -H 'accept: application/json'
 
 [group("develop")]
 detect-cat:
