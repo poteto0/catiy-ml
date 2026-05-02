@@ -6,6 +6,7 @@ from pydantic import PostgresDsn
 class AppSetting:
     def __init__(
         self,
+        env: str | None,
         databaseUrl: str | None,
         postgresUser: str,
         postgresPassword: str,
@@ -16,6 +17,7 @@ class AppSetting:
         r2AccessKeyID: str,
         r2AccessSecretKey: str,
     ) -> None:
+        self.env = env
         self.databaseUrl = databaseUrl
         self.postgresUser = postgresUser
         self.postgresPassword = postgresPassword
@@ -58,6 +60,7 @@ def init_setting() -> AppSetting:
     r2AccessSecretKey = os.getenv("R2_ACCESS_SECRET_KEY") or ""
 
     return AppSetting(
+        env=env,
         databaseUrl=databaseUrl,
         postgresUser=psqlUser,
         postgresDB=psqlDB,

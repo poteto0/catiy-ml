@@ -59,4 +59,10 @@ def trim_cat_and_update_from_results(
         return
 
     else:
+        query = TaskStatusUpdate(
+            taskId=task.id,
+            status=TaskStatus.TRIM_CAT_FINISHED,
+            hasCat=True,
+        )
+        update_tasks_status(db, [query])
         return
