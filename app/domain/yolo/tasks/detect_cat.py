@@ -6,13 +6,13 @@ from app.constants.task_status import TaskStatus
 from app.domain.yolo.usecase.detect_cat_and_update_from_img import (
     detect_cat_and_update_from_img,
 )
-from app.domain.yolo.usecase.verify_image import verify_image
 from app.ents import Task
 from app.exceptions.app import AppException
 from app.infra.repository.task import (
     TaskStatusUpdate,
     update_tasks_status,
 )
+from app.utils.image import verify_image
 
 
 def detect_cat_task(

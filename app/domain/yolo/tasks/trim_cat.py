@@ -9,13 +9,13 @@ from app.domain.yolo.usecase.detect_cat_and_update_from_img import (
 from app.domain.yolo.usecase.trim_cat_and_update_from_results import (
     trim_cat_and_update_from_results,
 )
-from app.domain.yolo.usecase.verify_image import verify_image
 from app.ents import Task
 from app.exceptions.app import AppException
 from app.infra.repository.task import (
     TaskStatusUpdate,
     update_tasks_status,
 )
+from app.utils.image import verify_image
 
 
 def trim_cat_task(

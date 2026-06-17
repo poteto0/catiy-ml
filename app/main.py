@@ -4,6 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.types import ExceptionHandler
 
 from app.api import health
+from app.api.v1 import clip as v1clip
 from app.api.v1 import task as v1task
 from app.api.v1 import yolo as v1yolo
 from app.exceptions import AppException
@@ -44,3 +45,4 @@ app.add_exception_handler(
 app.include_router(health.router, tags=["Health"], prefix="/health")
 app.include_router(v1yolo.router, tags=["v1", "yolo"], prefix="/v1/yolo")
 app.include_router(v1task.router, tags=["v1", "task"], prefix="/v1/task")
+app.include_router(v1clip.router, tags=["v1", "clip"], prefix="/v1/clip")
