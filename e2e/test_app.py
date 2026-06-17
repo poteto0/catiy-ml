@@ -175,3 +175,49 @@ def test_stop_till_detect_wo_cat(setup: TestClient) -> None:
     taskData = taskRes.json()
     assert taskData["status"] == "detect_cat:finished"
     assert not taskData["hasCat"]
+
+
+@pytest.mark.e2e
+def test_can_classify_cat_activity(setup: TestClient) -> None:
+    """猫の活動を分類できる"""
+    # Arrange
+    client = setup
+    labels = [
+        "eating cat",
+        "grooming cat",
+        "scratching cat",
+        "sleeping cat",
+    ]
+
+    with Path("fixtures/scratching-cat.jpeg").open("rb") as f:
+        # Act
+        res = client.post(
+            "/v1/clip/classify/cat/activity",
+            files={"file": ("scratching-cat.jpeg", f, "image/jpeg")},
+            data={"labels": labels},
+        )
+
+    # Assert
+    assert res.status_code == HTTP_200_OK
+    body = res.json()
+    assert body["mostLikelyLabel"] == "scratching cat"
+    assert len(body["results"]) == len(labels)
+    result_labels = {r["label"] for r in body["results"]}
+    assert result_labels == set(labels)
+
+
+@pytest.mark.e2e
+def test_badrequest_on_invalid_image_for_clip(setup: TestClient) -> None:
+    """無効な画像には400を返す"""
+    # Arrange
+    client = setup
+
+    # Act
+    res = client.post(
+        "/v1/clip/classify/cat/activity",
+        files={"file": ("invalid.jpg", b"not-an-image", "image/jpeg")},
+        data={"labels": ["eating", "sleeping"]},
+    )
+
+    # Assert
+    assert res.status_code == HTTP_400_BAD_REQUEST
