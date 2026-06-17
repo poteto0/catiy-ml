@@ -56,6 +56,17 @@ trimming-cat:
       -F 'file=@./fixtures/cat.jpg;type=image/jpeg'
 
 [group("develop")]
+classify-cat-activity:
+  @curl -X 'POST' \
+      'http://localhost:8080/v1/clip/classify/cat/activity' \
+      -H 'accept: application/json' \
+      -F 'file=@./fixtures/scratching-cat.jpeg;type=image/jpeg' \
+      -F 'labels=eating cat' \
+      -F 'labels=grooming cat' \
+      -F 'labels=scratching cat' \
+      -F 'labels=sleeping cat'
+
+[group("develop")]
 up *args="":
   @docker compose up {{args}}
 
