@@ -1,6 +1,7 @@
 from typing import cast
 
 from fastapi import Request
+from torchvision.models import EfficientNet
 from transformers import CLIPModel, CLIPProcessor
 from ultralytics import YOLO
 
@@ -15,6 +16,11 @@ def get_catiy_yolo(request: Request) -> YOLO:
 def get_clip(request: Request) -> tuple[CLIPModel, CLIPProcessor]:
     state = cast("AppState", request.app.state)
     return (state.clipModel, state.clipProcessor)
+
+
+def get_effnet(request: Request) -> EfficientNet:
+    state = cast("AppState", request.app.state)
+    return state.effnet
 
 
 def get_device(request: Request) -> str:

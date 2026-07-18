@@ -14,3 +14,5 @@ wheels/
 # metrics
 .coverage
 coverage.xml
+
+learning

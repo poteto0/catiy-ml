@@ -1,0 +1,5 @@
+nyansLabel = [
+    "bubu",
+    "nene",
+    "nyon",
+]

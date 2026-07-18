@@ -67,6 +67,14 @@ classify-cat-activity:
       -F 'labels=sleeping cat'
 
 [group("develop")]
+classify-bubu:
+  @curl -X 'POST' \
+      'http://localhost:8080/v1/effnet/classify/cat' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -d '{"cat_image_url": "1000006198.jpg"}'
+
+[group("develop")]
 up *args="":
   @docker compose up {{args}}
 
