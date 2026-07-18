@@ -67,10 +67,8 @@ class CatUpdate:
 
 def update_cats(db: Session, updateQueries: list[CatUpdate]) -> None:
     try:
-        for update in updateQueries:
-            cat = db.query(Cat).filter(Cat.id == update.catId).first()
-            if cat is not None:
-                cat.cat_name = update.catName
+        mappings = [{"id": update.catId, "cat_name": update.catName} for update in updateQueries]
+        db.bulk_update_mappings(Cat, mappings)
         db.commit()
     except SQLAlchemyError as exc:
         db.rollback()
