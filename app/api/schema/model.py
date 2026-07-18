@@ -48,7 +48,7 @@ class CatClassifyRequest(BaseModel):
         populate_by_name=True,
     )
 
-    catImageUrl: str = Field(min_length=1, max_length=100)
+    taskId: uuid.UUID
 
 
 class ClassifyResultUnit(BaseModel):

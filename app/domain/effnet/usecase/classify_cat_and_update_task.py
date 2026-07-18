@@ -13,11 +13,8 @@ from app.exceptions.app import AppException
 
 def classify_cat_and_update_task(
     image: Image,
-    db: Session,
-    r2Client: S3Client,
     model: EfficientNet,
-    task: Task,
-) -> None:
+) -> str:
     logger.info("classify_cat_and_update_task:start")
 
     logger.info("classify_cat_and_update_task > predict: start")
@@ -30,3 +27,5 @@ def classify_cat_and_update_task(
             msg=f"unexpected not found label: {mostLikely.label}",
             statusCode=HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+    return mostLikely.label

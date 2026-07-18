@@ -61,9 +61,24 @@ def find_cats_by_task_id(db: Session, taskId: uuid.UUID) -> list[CatModel]:
 
 @dataclass
 class CatUpdate:
+    catId: uuid.UUID
     catName: str
-    catImageUrl: str
-    taskId: str
+
+
+def update_cats(db: Session, updateQueries: list[CatUpdate]) -> None:
+    try:
+        for update in updateQueries:
+            cat = db.query(Cat).filter(Cat.id == update.catId).first()
+            if cat is not None:
+                cat.cat_name = update.catName
+        db.commit()
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise AppException(
+            code=SQL_ERROR,
+            msg="sql error on update cats",
+            statusCode=HTTP_503_SERVICE_UNAVAILABLE,
+        ) from exc
 
 
 def upload_cat_image(
