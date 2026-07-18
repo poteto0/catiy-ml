@@ -6,6 +6,7 @@ from loguru import logger
 from mypy_boto3_s3 import S3Client
 from PIL import Image
 from pydantic.dataclasses import dataclass
+from sqlalchemy import update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette.status import (
@@ -67,8 +68,10 @@ class CatUpdate:
 
 def update_cats(db: Session, updateQueries: list[CatUpdate]) -> None:
     try:
-        mappings = [{"id": update.catId, "cat_name": update.catName} for update in updateQueries]
-        db.bulk_update_mappings(Cat, mappings)
+        mappings = [
+            {"id": update.catId, "cat_name": update.catName} for update in updateQueries
+        ]
+        db.execute(update(Cat), mappings)
         db.commit()
     except SQLAlchemyError as exc:
         db.rollback()

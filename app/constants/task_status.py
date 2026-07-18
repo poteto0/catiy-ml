@@ -12,4 +12,3 @@ class TaskStatus(StrEnum):
     DETECT_CAT_FAILED = "detect_cat:failed"
     TRIM_CAT_FAILED = "trim_cat:failed"
     CLASSIFY_CAT_FAILED = "classify_cat:failed"
-

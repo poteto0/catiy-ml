@@ -14,12 +14,12 @@ def classify_cats(
 ) -> list[str]:
     if not images:
         return []
-        
+
     logger.info("classify_cats:start")
 
     logger.info("classify_cats > predict: start")
     results = predict_batch(model, images, nyansLabel)
-    
+
     labels = []
     for result in results:
         mostLikely = result.mostLikely

@@ -7,8 +7,8 @@ fmt-check:
   @uv run ruff format --check
 
 [group("ci")]
-lint:
-  @uv run ruff check .
+lint args="":
+  @uv run ruff check . {{args}}
 
 [group("ci")]
 check:

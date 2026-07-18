@@ -1,7 +1,6 @@
 import torch
 import torch.nn.functional as F
 import torchvision.transforms as T
-from loguru import logger
 from PIL.Image import Image
 from torchvision import transforms
 from torchvision.models import EfficientNet
@@ -42,7 +41,9 @@ def predict_batch(
         for prob, idx in zip(sorted_probs[i], sorted_indices[i], strict=True):
             idx_val = idx.item()
             prob_val = prob.item()
-            label_str = classes[idx_val] if (classes and idx_val < len(classes)) else None
+            label_str = (
+                classes[idx_val] if (classes and idx_val < len(classes)) else None
+            )
 
             results.append(
                 ClassifyResultUnit(
@@ -53,16 +54,11 @@ def predict_batch(
             )
 
         mostLikely = results[0]
-        if mostLikely.label:
-            logger.info(f"Top prediction for image {i}: {mostLikely.label} (prob: {mostLikely.prob:.2%})")
-        else:
-            logger.info(f"Top prediction for image {i}: index {mostLikely.idx} (prob: {mostLikely.prob:.2%})")
-            
         batch_results.append(
             ClassifyResult(
                 mostLikely=mostLikely,
                 results=results,
-            )
+            ),
         )
 
     return batch_results

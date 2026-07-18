@@ -228,30 +228,31 @@ def test_badrequest_on_invalid_image_for_clip(setup: TestClient) -> None:
     # Assert
     assert res.status_code == HTTP_400_BAD_REQUEST
 
+
 @pytest.mark.e2e
 def test_can_classify_cat_label(setup: TestClient) -> None:
     """猫のラベル分類ができる"""
     client = setup
-    
+
     # 1. Detect cat first
     with Path("fixtures/cat.jpg").open("rb") as f:
         files = {"file": ("cat.jpg", f, "image/jpeg")}
         res = client.post("/v1/yolo/detect/cat", files=files)
-    
+
     assert res.status_code == HTTP_200_OK
     targetTaskId = res.json()["id"]
-    
+
     sleep(0.3)
-    
+
     # 2. Start classification
     res_classify = client.post(
         "/v1/effnet/classify/cat",
-        json={"taskId": targetTaskId}
+        json={"taskId": targetTaskId},
     )
     assert res_classify.status_code == HTTP_200_OK
-    
+
     sleep(0.3)
-    
+
     # 3. Check status
     taskRes = client.get(f"/v1/task/status/{targetTaskId}")
     assert taskRes.status_code == HTTP_200_OK
